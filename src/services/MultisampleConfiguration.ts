@@ -183,7 +183,7 @@ export default class MultisampleConfiguration {
         return (this.getSamplepackDuration() / 1000) * bytesPerSeconds + 20000;
     }
 
-    private millisecondsToMidiTicks(ms: number) {
+    millisecondsToMidiTicks(ms: number) {
         return Math.floor(ms * 128) / ((60 / this.bpm) * 1000);
     }
 }

@@ -1,10 +1,10 @@
-import { createRouter, createWebHistory } from "vue-router";
+import { createRouter, createWebHashHistory } from "vue-router";
 import GeneratorRoute from "./Generator.route.vue";
 import ConfigBasicRoute from "./ConfigBasic.route.vue";
 
 
 export default createRouter({
-    history: createWebHistory(),
+    history: createWebHashHistory(),
     routes: [
         {
             path: '/',
