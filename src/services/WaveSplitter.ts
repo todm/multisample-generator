@@ -6,7 +6,7 @@ export default class WaveSplitter {
     private fmt: ChunkWavFmt;
     private data: ChunkWavData;
 
-    constructor(private file: Uint8Array, private multisampleConfiguration: MultisampleConfiguration) {
+    constructor(file: Uint8Array, private multisampleConfiguration: MultisampleConfiguration) {
         this.wav = new wavefile.WaveFile(file);
         this.fmt = this.wav.fmt as ChunkWavFmt;
         this.data = this.wav.data as ChunkWavData;
@@ -52,22 +52,6 @@ export default class WaveSplitter {
 
     framesToMilliseconds(frames: number) {
         return (frames / this.fmt.sampleRate) * 1000;
-    }
-
-    private normalizeWav(wav: wavefile.WaveFile) {
-        const valueCeil = this.getMaxValueForBitDepth(wav.bitDepth);
-        const samples = wav.getSamples(true);
-        let maxValue = 0;
-        for (let i = 0; i < samples.length; i++) {
-            if (samples[i] > maxValue) maxValue = samples[i];
-            if (samples[i] === valueCeil) break;
-        }
-        if (wav.bitDepth === '8') maxValue /= 2;
-
-        const factor = valueCeil / maxValue;
-        for (let i = 0; i < samples.length; i++) {
-            wav.setSample(i, samples[i] * factor);
-        }
     }
 
     private calculateDb(wav: wavefile.WaveFile) {
