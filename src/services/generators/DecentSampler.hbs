@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DecentSampler minVersion="1.9.0">
+    <ui width="812" height="375" bgColor="#00000000" bgImage="">
+        <tab name="main">
+            <labeled-knob parameterName="Attack" x="0" y="0" label="Attack" type="float" minValue="0" maxValue="10" trackBackgroundColor="#ffffffff">
+                <binding type="amp" level="instrument" parameter="ENV_ATTACK"/>
+            </labeled-knob>
+            <labeled-knob parameterName="Decay" x="80" y="0" label="Decay" type="float" minValue="0" maxValue="10" trackBackgroundColor="#ffffffff">
+                <binding type="amp" level="instrument" parameter="ENV_DECAY"/>
+            </labeled-knob>
+            <labeled-knob parameterName="Sustain" value="1" x="160" y="0" label="Sustain" type="float" minValue="0" maxValue="1" trackBackgroundColor="#ffffffff">
+                <binding type="amp" level="instrument" parameter="ENV_SUSTAIN"/>
+            </labeled-knob>
+            <labeled-knob parameterName="Release" value="0.1" x="240" y="0" label="Release" type="float" minValue="0" maxValue="10" trackBackgroundColor="#ffffffff">
+                <binding type="amp" level="instrument" parameter="ENV_RELEASE"/>
+            </labeled-knob>
+            <labeled-knob parameterName="Velocity Tracking" value="50" x="0" y="100" label="Velocity Tracking" type="float" minValue="0" maxValue="1" trackBackgroundColor="#ffffffff">
+                <binding type="amp" level="instrument" parameter="AMP_VEL_TRACK"/>
+            </labeled-knob>
+        </tab>
+    </ui>
+
+    <groups>
+        {{#each groups}}
+        <group>
+            {{#each this.samples}}
+            <sample
+                path="{{this.path}}"
+                rootNote="{{this.rootNote}}"
+                loNote="{{this.loNote}}"
+                hiNote="{{this.hiNote}}"
+                loVel="{{this.loVel}}"
+                hiVel="{{this.hiVel}}"
+                pitchKeyTrack="{{this.pitchKeyTrack}}"
+
+                loopEnabled="{{this.loopEnabled}}"
+                loopStart="{{this.loopStart}}"
+                loopEnd="{{this.loopEnd}}"
+                loopCrossfade="{{this.loopCrossfade}}"
+
+                seqMode="{{this.seqMode}}"
+                seqLength="{{this.seqLength}}"
+                seqPosition="{{this.seqPosition}}"
+
+                volume="{{this.gain}}dB"
+            />
+            {{/each}}
+        </group>
+        {{/each}}
+    </groups>
+</DecentSampler>

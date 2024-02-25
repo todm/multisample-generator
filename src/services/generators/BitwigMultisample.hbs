@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<multisample name="{{name}}">
+    <generator>MultisampleGenerator</generator>
+    {{#each groups}}
+    <group name="{{this.name}}" color="{{this.color}}"/>
+    {{/each}}
+
+    {{#each samples}}
+    <sample
+        file="{{this.file}}"
+        sample-start="{{this.sampleStart}}"
+        sample-stop="{{this.sampleStop}}"
+        group="{{this.group}}"
+        zone-logic="{{this.zoneLogic}}"
+        gain="{{this.gain}}"
+    >
+        <key 
+            root="{{this.keyRoot}}"
+            track="{{this.keyTrack}}"
+            low="{{this.keyLow}}"
+            high="{{this.keyHigh}}"
+        />
+        <velocity
+            low="{{this.velocityLow}}"
+            high="{{this.velocityHigh}}"
+        />
+        <loop
+            mode="{{this.loopMode}}"
+            start="{{this.loopStart}}"
+            stop="{{this.loopStop}}"
+            fade="{{this.loopFade}}"
+        />
+    </sample>
+    {{/each}}
+</multisample>
