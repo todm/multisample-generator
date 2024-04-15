@@ -7,11 +7,11 @@ defineProps<{
 </script>
 
 <template>
-    <div :class="{ disabled }">
-        <div class="is-flex is-align-items-center is-gap mt-5">
-            <span class="tag mr-3">{{ step }}</span>
-            <h6 class="title is-6">{{ name }}</h6>
-        </div>
+    <div :class="{ disabled }" class="mt-4">
+        <h6 class="title is-6">
+            <span class="badge text-bg-dark">{{ step }}</span>
+            {{ name }}
+        </h6>
         <div class="mt-3">
             <slot></slot>
         </div>

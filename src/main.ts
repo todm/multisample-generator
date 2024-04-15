@@ -1,8 +1,9 @@
 import { createApp } from "vue";
-import 'bulma/css/bulma.min.css';
 import "./style.css";
+import 'bootstrap/dist/css/bootstrap.min.css'
 import App from "./App.vue";
 import router from "./routes/router";
+// import {} from 'bootstrap'
 
 const app = createApp(App);
 
