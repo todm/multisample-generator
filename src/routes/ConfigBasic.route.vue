@@ -7,6 +7,7 @@ import { Info } from 'lucide-vue-next';
 import Modal from '../components/Modal.vue';
 import Accordion from '../components/Accordion.vue';
 import AccordionItem from '../components/AccordionItem.vue';
+import MultiRange from '../components/MultiRange.vue';
 
 import MultisampleConfiguration from '../services/MultisampleConfiguration';
 import { downloadData, midiToNoteName } from '../services/utils';
@@ -66,7 +67,7 @@ function downloadConfig() {
     downloadData(data, `${multisampleConfiguration.value.name}_${multisampleConfiguration.value.getBPM()}bpm.json`);
 }
 
-watch(generationData, regenerateConfig);
+watch(generationData, () => regenerateConfig());
 onMounted(regenerateConfig);
 </script>
 
@@ -115,31 +116,24 @@ onMounted(regenerateConfig);
                 </tbody>
             </table>
             <div class="col">
-                <!-- <MultisampleViewVue :config="multisampleConfiguration" /> -->
                 <MultisampleView class="multisample-view" :config="multisampleConfiguration" v-if="multisampleConfiguration" />
             </div>
         </div>
 
         <Modal title="Estimated size" ref="modal">
             <p>The size of the wavefile will be calculated with the following parameters:</p>
-            <div class="is-flex mt-4 gap-1">
-                <div class="field">
-                    <label class="label">Samplerate</label>
-                    <div class="control">
-                        <input class="input" v-model="sizeParams.samplerate" type="number" min="0" max="500000" />
-                    </div>
+            <div class="row">
+                <div class="col-auto">
+                    <label class="form-label">Samplerate:</label>
+                    <input type="number" class="form-control" min="0" max="500000" v-model="sizeParams.samplerate" />
                 </div>
-                <div class="field">
-                    <label class="label">BitDepth</label>
-                    <div class="control">
-                        <input class="input" v-model="sizeParams.bitdepth" type="number" min="0" max="128" />
-                    </div>
+                <div class="col-auto">
+                    <label class="form-label">BitDepth:</label>
+                    <input type="number" class="form-control" min="0" max="128" v-model="sizeParams.bitdepth" />
                 </div>
-                <div class="field">
-                    <label class="label">Channels</label>
-                    <div class="control">
-                        <input class="input" v-model="sizeParams.channels" type="number" min="0" max="8" />
-                    </div>
+                <div class="col-auto">
+                    <label class="form-label">Channels:</label>
+                    <input type="number" class="form-control" min="0" max="8" v-model="sizeParams.channels" />
                 </div>
             </div>
             <p v-if="multisampleConfiguration">
@@ -198,8 +192,7 @@ onMounted(regenerateConfig);
                         -
                         <span class="badge text-bg-secondary">{{ midiToNoteName(generationData.keyEnd) }}</span>
                     </label>
-                    <input type="range" class="form-range" v-model="generationData.keyStart" min="0" max="127" />
-                    <input type="range" class="form-range" v-model="generationData.keyEnd" min="0" max="127" />
+                    <MultiRange :min="0" :max="127" v-model:v1="generationData.keyStart" v-model:v2="generationData.keyEnd" />
                     <div class="piano"></div>
                 </div>
                 <div class="row">
@@ -222,16 +215,13 @@ onMounted(regenerateConfig);
                 </div>
             </AccordionItem>
             <AccordionItem header="Velocity" val="vel">
-                <div class="row">
-                    <div class="col-auto">
-                        <label class="col-form-label">Velocity Start</label>
-                        <input class="form-control" v-model="generationData.velStart" type="number" min="0" max="127" />
-                    </div>
-                    <div class="col-auto">
-                        <label class="col-form-label">Velocity End</label>
-                        <input class="form-control" v-model="generationData.velEnd" type="number" min="0" max="127" />
-                    </div>
-                </div>
+                <label class="form-label">
+                    Velocity Range
+                    <span class="badge text-bg-secondary">{{ generationData.velStart }}</span>
+                    -
+                    <span class="badge text-bg-secondary">{{ generationData.velEnd }}</span>
+                </label>
+                <MultiRange :min="0" :max="127" v-model:v1="generationData.velStart" v-model:v2="generationData.velEnd" />
                 <div class="row">
                     <div class="col-auto">
                         <label class="col-form-label">Velocity Steps</label>
@@ -293,7 +283,7 @@ onMounted(regenerateConfig);
                 </div>
             </AccordionItem>
         </Accordion>
-        <Button class="btn btn-primary mt-3" @click="downloadConfig" :disabled="!multisampleConfiguration">Download Configuration</Button>
+        <button class="btn btn-primary mt-3" @click="downloadConfig" :disabled="!multisampleConfiguration">Download Configuration</button>
     </ContainerCard>
 </template>
 

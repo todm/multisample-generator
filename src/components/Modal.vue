@@ -26,19 +26,24 @@ function getStatus() {
 </script>
 
 <template>
-    <div class="modal" :class="{ 'is-active': active }">
-        <div class="modal-background" @click="active = false"></div>
-        <div class="modal-card">
-            <div class="modal-card-head">
-                <p class="modal-card-title">{{ title }}</p>
-                <button class="delete" aria-label="close" @click="active = false"></button>
+    <div class="modal fade" :class="{ show: active }">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5">{{ title }}</h1>
+                    <button class="btn-close" @click="close"></button>
+                </div>
+                <div class="modal-body">
+                    <slot></slot>
+                </div>
             </div>
-            <section class="modal-card-body">
-                <slot></slot>
-            </section>
-            <footer class="modal-card-foot">
-                <slot name="footer"></slot>
-            </footer>
         </div>
     </div>
 </template>
+
+<style scoped>
+.show {
+    display: block;
+    background-color: #0000009a;
+}
+</style>

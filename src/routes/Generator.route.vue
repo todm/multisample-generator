@@ -100,7 +100,7 @@ async function onGenerateLibrary() {
         </Step>
 
         <Step step="Step 2" name="Download MIDI File" :disabled="!multisampleConfiguration">
-            <button class="btn btn-dark" @click="onDownloadMidi">Download MIDI File</button>
+            <button class="btn btn-secondary" @click="onDownloadMidi">Download MIDI File</button>
         </Step>
 
         <Step step="Step 3" name="Render the MIDI File to Audio" :disabled="!multisampleConfiguration">
@@ -121,14 +121,6 @@ async function onGenerateLibrary() {
                     <option value="bitwig">Bitwig Multisample</option>
                     <option value="decentsamler">Decentsampler</option>
                 </select>
-                <!-- <Dropdown
-                    :options="{
-                        bitwig: 'Bitwig Multisample',
-                        decentsampler: 'Decentsampler'
-                    }"
-                    placeholder="Library Type"
-                    v-model="outputType"
-                    /> -->
                 &nbsp;
                 &nbsp;
                 <button class="btn btn-primary col-auto" @click="onGenerateLibrary" :disabled="!outputType">Generate</button>
