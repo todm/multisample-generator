@@ -116,7 +116,12 @@ onMounted(regenerateConfig);
                 </tbody>
             </table>
             <div class="col">
-                <MultisampleView class="multisample-view" :config="multisampleConfiguration" v-if="multisampleConfiguration" />
+                <MultisampleView class="multisample-view" :config="multisampleConfiguration" v-if="multisampleConfiguration" :bounds="{
+                    t: generationData.velEnd,
+                    r: generationData.keyEnd,
+                    b: generationData.velStart,
+                    l: generationData.keyStart,
+                }" />
             </div>
         </div>
 
