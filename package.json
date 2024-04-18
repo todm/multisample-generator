@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "bulma": "^0.9.4",
+    "bootstrap": "^5.3.3",
     "handlebars": "^4.7.8",
     "jszip": "^3.10.1",
     "lucide-vue-next": "^0.338.0",
@@ -20,6 +20,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@types/bootstrap": "^5.2.10",
     "@vitejs/plugin-vue": "^5.0.4",
     "typescript": "^5.2.2",
     "vite": "^5.1.4",

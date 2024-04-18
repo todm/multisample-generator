@@ -4,6 +4,12 @@ import { onMounted, watch, ref } from 'vue';
 
 const props = defineProps<{
     config: MultisampleConfiguration;
+    bounds?: {
+        t: number;
+        r: number;
+        b: number;
+        l: number;
+    };
 }>();
 
 const canvas = ref<HTMLCanvasElement>();
@@ -24,8 +30,11 @@ function draw() {
     const cellHeight = ctx.canvas.height / 127;
 
     ctx.fillStyle = '#00008833';
+    ctx.strokeStyle = '#000000';
 
     for (const area of props.config.getSampleAreas()) {
+        ctx.fillStyle = '#00008833';
+        ctx.strokeStyle = '#000000';
         ctx.fillRect(
             area.keyLow * cellWidth, //
             area.velLow * cellHeight,
@@ -38,8 +47,24 @@ function draw() {
             (area.keyHigh - area.keyLow + 1) * cellWidth,
             (area.velHigh - area.velLow + 1) * cellHeight
         );
+        ctx.fillStyle = '#00008844';
+        ctx.fillRect(
+            area.keyRoot * cellWidth, //
+            area.velRoot * cellHeight-5,
+            5,
+            5
+        );
     }
-    ctx.stroke();
+
+    if (props.bounds) {
+        ctx.strokeStyle = '#ff000080';
+        ctx.strokeRect(
+            props.bounds.l * cellWidth,
+            props.bounds.b * cellHeight,
+            (props.bounds.r - props.bounds.l + 1) * cellWidth,
+            (props.bounds.t - props.bounds.b + 1) * cellHeight
+        );
+    }
 }
 
 onMounted(() => draw());

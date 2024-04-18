@@ -2,10 +2,7 @@
 import { ref } from 'vue';
 
 import Step from '../components/Step.vue';
-import FileInput from '../components/FileInput.vue';
 import ContainerCard from '../components/ContainerCard.vue';
-import Dropdown from '../components/Dropdown.vue';
-import PropertiesDisplay from '../components/PropertiesDisplay.vue';
 import MultisampleViewVue from '../components/MultisampleView.vue';
 
 import MultisampleConfiguration from '../services/MultisampleConfiguration';
@@ -61,53 +58,73 @@ async function onGenerateLibrary() {
 <template>
     <ContainerCard title="Multisample Generator" subtitle="Automatically generate sample libraries from midi capable instruments">
         <Step step="Step 1" name="Select Configuration">
-            <FileInput @change="onMultisampleConfigInput" accept="application/json" />
+            <input type="file" class="form-control" @change="onMultisampleConfigInput" accept="application/json" />
             <div class="is-flex">
-                <a @click="$router.push({ name: 'config-basic' })">Generate Configuration</a>
-                <span class="has-text-grey-light ml-2 mr-2">|</span>
-                <a href="https://github.com/todm/multisample-generator/tree/main/templates">Browse predefined configurations</a>
+                <button class="btn btn-link" @click="$router.push({ name: 'config-basic' })">Generate Configuration</button>
+                |
+                <a class="btn btn-link" href="https://github.com/todm/multisample-generator/tree/main/templates">Browse predefined configurations</a>
             </div>
-            <div class="card is-flex mt-3 p-4" v-if="multisampleConfiguration">
-                <PropertiesDisplay
-                    :options="{
-                        Name: multisampleConfiguration.name,
-                        BPM: multisampleConfiguration.getBPM().toString(),
-                        Areas: multisampleConfiguration.getSampleAreas().length.toString(),
-                        Autogain: multisampleConfiguration.autogain.toString(),
-                        'Samplepack Duration': Number(multisampleConfiguration.getSamplepackDuration() / 1000 / 60).toFixed(2) + ' min',
-                        'Total Duration': Number(multisampleConfiguration.getFullDuration() / 1000 / 60).toFixed(2) + ' min'
-                    }"
-                    style="width: 50%"
-                />
-                <MultisampleViewVue :config="multisampleConfiguration" style="width: 50%" />
+            <div class="row align-items-start mt-2" v-if="multisampleConfiguration">
+                <table class="table col">
+                    <tbody>
+                        <tr>
+                            <th>Name:</th>
+                            <td>{{ multisampleConfiguration?.name }}</td>
+                        </tr>
+                        <tr>
+                            <th>BPM:</th>
+                            <td>{{ multisampleConfiguration?.getBPM() }}</td>
+                        </tr>
+                        <tr>
+                            <th>Areas:</th>
+                            <td>{{ multisampleConfiguration?.getSampleAreas().length }}</td>
+                        </tr>
+                        <tr>
+                            <th>Autogain:</th>
+                            <td>{{ multisampleConfiguration?.autogain }}</td>
+                        </tr>
+                        <tr>
+                            <th>Samplepack Duration:</th>
+                            <td>{{ Number((multisampleConfiguration.getSamplepackDuration() || 0) / 1000 / 60).toFixed(2) + 'min' }}</td>
+                        </tr>
+                        <tr>
+                            <th>WAV Duration:</th>
+                            <td>{{ Number(multisampleConfiguration.getFullDuration() / 1000 / 60).toFixed(2) + ' min' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="col">
+                    <MultisampleViewVue :config="multisampleConfiguration" />
+                </div>
             </div>
         </Step>
 
         <Step step="Step 2" name="Download MIDI File" :disabled="!multisampleConfiguration">
-            <button class="button" @click="onDownloadMidi">Download MIDI File</button>
+            <button class="btn btn-secondary" @click="onDownloadMidi">Download MIDI File</button>
         </Step>
 
         <Step step="Step 3" name="Render the MIDI File to Audio" :disabled="!multisampleConfiguration">
-            <p class="pl-2">
-                Use a daw to render the downloaded midi file to a <b>wav</b> file. Make sure to set the <b>correct bpm</b> specified in the
-                configuration file!
-            </p>
+            <p>Render the <b>.mid</b> file to a <b>.wav</b> file in your favourit DAW.</p>
+            <ul>
+                <li>Make sure to set the correct BPM</li>
+                <li>Your instrument should be as loud as possible without clipping</li>
+            </ul>
         </Step>
 
         <Step step="Step 4" name="Upload the wav file" :disabled="!multisampleConfiguration">
-            <FileInput @change="onWavfileInput" accept="audio/wav" />
+            <input type="file" class="form-control" @change="onWavfileInput" accept="audio/wav" />
         </Step>
 
         <Step step="Step 5" name="Generate the sample-library" :disabled="!multisampleConfiguration || !wavFile">
-            <Dropdown
-                :options="{
-                    bitwig: 'Bitwig Multisample',
-                    decentsampler: 'Decentsampler'
-                }"
-                placeholder="Library Type"
-                v-model="outputType"
-            />
-            <button class="button is-primary ml-2" @click="onGenerateLibrary" :disabled="!outputType">Generate</button>
+            <div class="row g-3 w-75">
+                <select class="form-select col" v-model="outputType">
+                    <option value="bitwig">Bitwig Multisample</option>
+                    <option value="decentsamler">Decentsampler</option>
+                </select>
+                &nbsp;
+                &nbsp;
+                <button class="btn btn-primary col-auto" @click="onGenerateLibrary" :disabled="!outputType">Generate</button>
+            </div>
         </Step>
     </ContainerCard>
 </template>

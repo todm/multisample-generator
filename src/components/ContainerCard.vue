@@ -6,21 +6,19 @@ defineProps({
 </script>
 
 <template>
-    <div class="box container">
-        <div class="media">
-            <div class="media-content">
-                <p class="title is-4">{{ title }}</p>
-                <p class="subtitle is-6">{{ subtitle }}</p>
-            </div>
-        </div>
-        <div class="mt-4">
+    <div class="card container mb-3">
+        <slot name="img"></slot>
+        <div class="card-body">
+            <h5 class="card-title">{{ title }}</h5>
+            <h6 class="card-subtitle mb-2 text-body-secondary">{{ subtitle }}</h6>
+            <hr>
             <slot></slot>
         </div>
     </div>
 </template>
 
 <style scoped>
-.box.container {
-    max-width: 42rem;
+.card {
+    max-width: 64rem;
 }
 </style>
