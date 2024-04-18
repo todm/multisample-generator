@@ -57,7 +57,7 @@ function draw() {
     }
 
     if (props.bounds) {
-        ctx.strokeStyle = '#ff0000';
+        ctx.strokeStyle = '#ff000080';
         ctx.strokeRect(
             props.bounds.l * cellWidth,
             props.bounds.b * cellHeight,
