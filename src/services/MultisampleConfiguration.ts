@@ -103,16 +103,17 @@ export default class MultisampleConfiguration {
                 keyRoot = 0;
             if (k === 0) keyLow = params.keyStart;
             else keyLow = currentKeyPosition;
-            
+
             if (k === keySteps - 1) keyHigh = params.keyEnd;
             else keyHigh = keyLow + params.keyWidth + keyRemainder - 1;
             currentKeyPosition = keyHigh + 1;
 
-            keyRoot = Math.round(keyLow + ((keyHigh-keyLow) * (params.keyRoot ?? .5)))
+            keyRoot = Math.round(keyLow + (keyHigh - keyLow) * (params.keyRoot ?? 0.5));
 
             if (k === 0 && params.keyFill) keyLow = 0;
             if (k === keySteps - 1 && params.keyFill) keyHigh = 127;
 
+            let velMax = 0;
             for (let v = 0; v < velSteps; v++) {
                 velRemainderStore += velRemainderPerArea;
                 const velRemainder = Math.floor(velRemainderStore);
@@ -121,20 +122,20 @@ export default class MultisampleConfiguration {
                 let velLow = 0,
                     velHigh = 0,
                     velRoot = 0;
-                
+
                 if (v === 0) velLow = params.velStart;
                 else velLow = currentVelPosition;
-                
+
                 if (v === velSteps - 1) velHigh = params.velEnd;
                 else velHigh = velLow + params.velWidth + velRemainder - 1;
                 currentVelPosition = velHigh + 1;
 
-                velRoot = Math.round(velLow + ((velHigh - velLow) * (params.velRoot ?? 1)));
+                velRoot = Math.round(velLow + (velHigh - velLow) * (params.velRoot ?? 1));
 
                 if (v === 0 && params.velFill) velLow = 0;
-                if (v === velSteps - 1 && params.velFill) velHigh = 127;
+                if (v === velSteps - 1 && params.velFill && !params.velMax) velHigh = 127;
 
-                // console.log(velLow)
+                if (velHigh > velMax) velMax = velHigh;
 
                 msc.addSampleArea({
                     attack: params.attack ?? 0,
@@ -149,6 +150,28 @@ export default class MultisampleConfiguration {
                     velLow,
                     velHigh,
                     velRoot,
+
+                    loop: params.loop,
+                    loopStart: params.loopStart,
+                    loopEnd: params.loopEnd,
+                    loopFade: params.loopFade
+                });
+            }
+
+            if (params.velMax && params.velEnd < 127) {
+                msc.addSampleArea({
+                    attack: params.attack ?? 0,
+                    hold: params.hold,
+                    decay: params.decay ?? 0,
+                    keytrack: params.keytrack ?? 1,
+
+                    keyLow,
+                    keyHigh,
+                    keyRoot,
+
+                    velLow: velMax + 1,
+                    velHigh: 127,
+                    velRoot: 127,
 
                     loop: params.loop,
                     loopStart: params.loopStart,
@@ -297,6 +320,7 @@ type generateBasicConfigurationInput = {
     velWidth: number;
     velFill?: boolean;
     velRoot?: number;
+    velMax?: boolean;
 
     attack?: number;
     hold: number;

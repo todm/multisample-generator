@@ -36,6 +36,7 @@ const generationData = reactive<BasicConfiguration>({
     velWidth: 24,
     velFill: true,
     velRoot: 100,
+    velMax: false,
 
     loop: false,
     loopStart: 0,
@@ -265,6 +266,10 @@ onMounted(regenerateConfig);
                 <div class="form-check mt-3">
                     <input class="form-check-input" v-model="generationData.velFill" type="checkbox" />
                     <label class="form-check-label">Velocity Fill</label>
+                </div>
+                <div class="form-check mt-3">
+                    <input class="form-check-input" v-model="generationData.velMax" type="checkbox" />
+                    <label class="form-check-label">Heavy Hitter</label>
                 </div>
                 <div class="form-check mt-3">
                     <input class="form-check-input" v-model="generationData.autogain" type="checkbox" />
