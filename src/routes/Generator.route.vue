@@ -119,7 +119,7 @@ async function onGenerateLibrary() {
             <div class="row g-3 w-75">
                 <select class="form-select col" v-model="outputType">
                     <option value="bitwig">Bitwig Multisample</option>
-                    <option value="decentsamler">Decentsampler</option>
+                    <option value="decentsampler">Decentsampler</option>
                 </select>
                 &nbsp;
                 &nbsp;

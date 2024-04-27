@@ -9,6 +9,7 @@ export default class MultisampleConfiguration {
     private bpm: number = 128;
     private sampleSeparation: number = 0;
     private sampleAreas: SampleArea[];
+    readonly metadata: Record<string, any> = {};
 
     constructor(name: string, bpm: number, sampleSeparation: number, public autogain = false) {
         this.name = name;
@@ -74,17 +75,67 @@ export default class MultisampleConfiguration {
     }
 
     static generateBasicConfiguration(params: generateBasicConfigurationInput) {
-        const keySize = params.keyEnd - params.keyStart + 1;
-        const keyWidth = Math.floor(keySize / params.keySteps);
-        const velSize = params.velEnd - params.velStart + 1;
-        const velWidth = Math.floor(velSize / params.velSteps);
-
         const msc = new MultisampleConfiguration(params.name, params.bpm, params.sampleSeparation, params.autogain);
 
-        for (let x = 0; x < params.keySteps; x++) {
-            for (let y = 0; y < params.velSteps; y++) {
-                const keyPos = params.keyStart + x * keyWidth;
-                const velPos = params.velStart + y * velWidth;
+        const keySize = params.keyEnd - params.keyStart;
+        const velSize = params.velEnd - params.velStart;
+        const keySteps = Math.floor(keySize / params.keyWidth);
+        const velSteps = Math.floor(velSize / params.velWidth);
+
+        const keyRemainder = keySize - keySteps * params.keyWidth;
+        const keyRemainderPerArea = keyRemainder / keySteps;
+        const velRemainder = velSize - velSteps * params.velWidth;
+        const velRemainderPerArea = velRemainder / velSteps;
+
+        let keyRemainderStore = 0;
+        let velRemainderStore = 0;
+
+        let currentKeyPosition = params.keyStart;
+        let currentVelPosition = params.velStart;
+
+        for (let k = 0; k < keySteps; k++) {
+            keyRemainderStore += keyRemainderPerArea;
+            const keyRemainder = Math.floor(keyRemainderStore);
+            keyRemainderStore -= keyRemainder;
+
+            let keyLow = 0,
+                keyHigh = 0,
+                keyRoot = 0;
+            if (k === 0) keyLow = params.keyStart;
+            else keyLow = currentKeyPosition;
+
+            if (k === keySteps - 1) keyHigh = params.keyEnd;
+            else keyHigh = keyLow + params.keyWidth + keyRemainder - 1;
+            currentKeyPosition = keyHigh + 1;
+
+            keyRoot = Math.round(keyLow + (keyHigh - keyLow) * (params.keyRoot ?? 0.5));
+
+            if (k === 0 && params.keyFill) keyLow = 0;
+            if (k === keySteps - 1 && params.keyFill) keyHigh = 127;
+
+            let velMax = 0;
+            for (let v = 0; v < velSteps; v++) {
+                velRemainderStore += velRemainderPerArea;
+                const velRemainder = Math.floor(velRemainderStore);
+                velRemainderStore -= velRemainder;
+
+                let velLow = 0,
+                    velHigh = 0,
+                    velRoot = 0;
+
+                if (v === 0) velLow = params.velStart;
+                else velLow = currentVelPosition;
+
+                if (v === velSteps - 1) velHigh = params.velEnd;
+                else velHigh = velLow + params.velWidth + velRemainder - 1;
+                currentVelPosition = velHigh + 1;
+
+                velRoot = Math.round(velLow + (velHigh - velLow) * (params.velRoot ?? 1));
+
+                if (v === 0 && params.velFill) velLow = 0;
+                if (v === velSteps - 1 && params.velFill && !params.velMax) velHigh = 127;
+
+                if (velHigh > velMax) velMax = velHigh;
 
                 msc.addSampleArea({
                     attack: params.attack ?? 0,
@@ -92,13 +143,13 @@ export default class MultisampleConfiguration {
                     decay: params.decay ?? 0,
                     keytrack: params.keytrack ?? 1,
 
-                    keyRoot: Math.floor(keyPos + keyWidth / 2),
-                    keyLow: x == 0 && params.keyFill ? 0 : keyPos,
-                    keyHigh: x == params.keySteps - 1 ? (params.keyFill ? 127 : params.keyEnd) : keyPos + keyWidth - 1,
+                    keyLow,
+                    keyHigh,
+                    keyRoot,
 
-                    velRoot: y === params.velSteps - 1 ? params.velEnd : velPos + velWidth,
-                    velLow: y == 0 && params.velFill ? 0 : velPos,
-                    velHigh: y == params.velSteps - 1 ? (params.velFill ? 127 : params.velEnd) : velPos + velWidth -1,
+                    velLow,
+                    velHigh,
+                    velRoot,
 
                     loop: params.loop,
                     loopStart: params.loopStart,
@@ -106,7 +157,33 @@ export default class MultisampleConfiguration {
                     loopFade: params.loopFade
                 });
             }
+
+            if (params.velMax && params.velEnd < 127) {
+                msc.addSampleArea({
+                    attack: params.attack ?? 0,
+                    hold: params.hold,
+                    decay: params.decay ?? 0,
+                    keytrack: params.keytrack ?? 1,
+
+                    keyLow,
+                    keyHigh,
+                    keyRoot,
+
+                    velLow: velMax + 1,
+                    velHigh: 127,
+                    velRoot: 127,
+
+                    loop: params.loop,
+                    loopStart: params.loopStart,
+                    loopEnd: params.loopEnd,
+                    loopFade: params.loopFade
+                });
+            }
+            currentVelPosition = params.velStart;
+            velRemainderStore = 0;
         }
+
+        msc.metadata.basicConfig = params;
         return msc;
     }
 
@@ -234,13 +311,16 @@ type generateBasicConfigurationInput = {
 
     keyStart: number;
     keyEnd: number;
-    keySteps: number;
+    keyWidth: number;
     keyFill?: boolean;
+    keyRoot?: number;
 
     velStart: number;
     velEnd: number;
-    velSteps: number;
+    velWidth: number;
     velFill?: boolean;
+    velRoot?: number;
+    velMax?: boolean;
 
     attack?: number;
     hold: number;
