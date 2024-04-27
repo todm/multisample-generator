@@ -49,10 +49,10 @@ function draw() {
         );
         ctx.fillStyle = '#00008844';
         ctx.fillRect(
-            area.keyRoot * cellWidth, //
-            area.velRoot * cellHeight-5,
-            5,
-            5
+            area.keyRoot * cellWidth -2, //
+            area.velRoot * cellHeight-2,
+            4,
+            4
         );
     }
 

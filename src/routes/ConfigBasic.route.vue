@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref, watch } from 'vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 
 import ContainerCard from '../components/ContainerCard.vue';
 import MultisampleView from '../components/MultisampleView.vue';
@@ -26,14 +26,16 @@ const generationData = reactive<BasicConfiguration>({
 
     keyStart: 20,
     keyEnd: 100,
-    keySteps: 8,
+    keyWidth: 4,
     keyFill: true,
     keytrack: 100,
+    keyRoot: 50,
 
     velStart: 30,
     velEnd: 127,
-    velSteps: 4,
+    velWidth: 24,
     velFill: true,
+    velRoot: 100,
 
     loop: false,
     loopStart: 0,
@@ -50,13 +52,23 @@ const sizeParams = reactive({
 const modal = ref<typeof Modal>();
 
 const multisampleConfiguration = ref<MultisampleConfiguration>();
+const keyAreaCount = computed({
+    get: () => Math.floor((generationData.keyEnd - generationData.keyStart) / generationData.keyWidth),
+    set: v => generationData.keyWidth = Math.floor((generationData.keyEnd - generationData.keyStart) / v)
+});
+const velAreaCount = computed({
+    get: () => Math.floor((generationData.velEnd - generationData.velStart) / generationData.velWidth),
+    set: v => generationData.velWidth = Math.floor((generationData.velEnd - generationData.velStart) / v)
+});
 
 function regenerateConfig() {
     try {
         multisampleConfiguration.value = MultisampleConfiguration.generateBasicConfiguration({
             ...generationData,
             keytrack: generationData.keytrack && generationData.keytrack / 100,
-            loopFade: generationData.loopFade && generationData.loopFade / 100
+            loopFade: generationData.loopFade && generationData.loopFade / 100,
+            keyRoot: generationData.keyRoot && generationData.keyRoot / 100,
+            velRoot: generationData.velRoot && generationData.velRoot / 100
         });
     } catch (ex) {}
 }
@@ -116,12 +128,17 @@ onMounted(regenerateConfig);
                 </tbody>
             </table>
             <div class="col">
-                <MultisampleView class="multisample-view" :config="multisampleConfiguration" v-if="multisampleConfiguration" :bounds="{
-                    t: generationData.velEnd,
-                    r: generationData.keyEnd,
-                    b: generationData.velStart,
-                    l: generationData.keyStart,
-                }" />
+                <MultisampleView
+                    class="multisample-view"
+                    :config="multisampleConfiguration"
+                    v-if="multisampleConfiguration"
+                    :bounds="{
+                        t: generationData.velEnd,
+                        r: generationData.keyEnd,
+                        b: generationData.velStart,
+                        l: generationData.keyStart
+                    }"
+                />
             </div>
         </div>
 
@@ -202,12 +219,16 @@ onMounted(regenerateConfig);
                 </div>
                 <div class="row">
                     <div class="col-auto">
-                        <label class="col-form-label">Key Steps</label>
-                        <input class="form-control" v-model="generationData.keySteps" type="number" min="0" max="127" />
+                        <label class="col-form-label">Key Area Width</label>
+                        <input class="form-control" v-model="generationData.keyWidth" type="number" min="1" max="127" />
                     </div>
                     <div class="col-auto">
-                        <label class="col-form-label">Key Steps</label>
-                        <input class="form-control" v-model="generationData.keySteps" type="number" min="0" max="127" />
+                        <label class="col-form-label">Key Area Count</label>
+                        <input class="form-control" v-model="keyAreaCount" type="number" min="1" max="127" />
+                    </div>
+                    <div class="col-auto">
+                        <label class="col-form-label">Root Position <span class="badge text-bg-secondary">%</span></label>
+                        <input class="form-control" v-model="generationData.keyRoot" type="number" min="0" max="100" />
                     </div>
                     <div class="col-auto">
                         <label class="col-form-label">Keytrack <span class="badge text-bg-secondary">%</span></label>
@@ -229,12 +250,16 @@ onMounted(regenerateConfig);
                 <MultiRange :min="0" :max="127" v-model:v1="generationData.velStart" v-model:v2="generationData.velEnd" />
                 <div class="row">
                     <div class="col-auto">
-                        <label class="col-form-label">Velocity Steps</label>
-                        <input class="form-control" v-model="generationData.velSteps" type="number" min="0" max="127" />
+                        <label class="col-form-label">Velocity Area Width</label>
+                        <input class="form-control" v-model="generationData.velWidth" type="number" min="1" max="127" />
                     </div>
                     <div class="col-auto">
-                        <label class="col-form-label">Velocity Steps</label>
-                        <input class="form-control" v-model="generationData.velSteps" type="number" min="0" max="127" />
+                        <label class="col-form-label">Velocity Area Count</label>
+                        <input class="form-control" v-model="velAreaCount" type="number" min="1" max="127" />
+                    </div>
+                    <div class="col-auto">
+                        <label class="col-form-label">Root Position <span class="badge text-bg-secondary">%</span></label>
+                        <input class="form-control" v-model="generationData.velRoot" type="number" min="0" max="100" />
                     </div>
                 </div>
                 <div class="form-check mt-3">
